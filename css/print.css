@@ -1,0 +1,216 @@
+/* Print styles for Simple Calendar - Year View */
+
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 10px;
+        overflow: visible !important;
+        float: none !important;
+        display: block !important;
+    }
+    
+    /* Ensure all parent elements don't interfere with page breaks */
+    * {
+        float: none !important;
+    }
+    
+    .year-section,
+    .year-section * {
+        float: none !important;
+    }
+
+    .app-container {
+        max-width: none !important;
+        width: 100% !important;
+        min-width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        float: none !important;
+        display: block !important;
+    }
+
+    /* Hide non-essential elements */
+    .toolbar,
+    .nav-btn,
+    .calendar-header {
+        display: none !important;
+    }
+
+    /* Calendar header - hidden in print */
+    .calendar-header {
+        display: none !important;
+    }
+
+    /* Calendar container */
+    .calendar-container {
+        background: white !important;
+        box-shadow: none !important;
+        border: 1px solid #333;
+        padding: 5px;
+        overflow: visible !important;
+        max-height: none !important;
+        float: none !important;
+        display: block !important;
+    }
+
+    .calendar-scroll-container {
+        gap: 20px !important;
+        float: none !important;
+        display: block !important;
+        flex-direction: column !important;
+    }
+
+    .year-section {
+        gap: 5px !important;
+        display: block !important;
+        page-break-inside: avoid !important;
+    }
+    
+    .year-section + .year-section {
+        page-break-before: always !important;
+    }
+
+    .year-header {
+        background: #333 !important;
+        color: white !important;
+        padding: 8px 15px !important;
+        font-size: 18px !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+    }
+
+    .year-calendar-grid {
+        min-width: auto !important;
+        display: grid !important;
+        grid-template-columns: 80px repeat(31, 25px) !important;
+        gap: 1px !important;
+    }
+
+    .month-header {
+        background: #f0f0f0 !important;
+        color: black !important;
+        font-weight: bold;
+        border: 1px solid #333;
+        padding: 4px 2px;
+        font-size: 8px;
+    }
+
+    .day-header {
+        background: #f8f8f8 !important;
+        color: black !important;
+        font-weight: bold;
+        border: 1px solid #333;
+        padding: 2px 1px;
+        font-size: 6px;
+    }
+
+    .year-calendar-cells {
+        grid-column: 1 / -1 !important;
+        display: grid !important;
+        grid-template-columns: 80px repeat(31, 25px) !important;
+        gap: 1px !important;
+    }
+
+    .day-cell {
+        background: white !important;
+        border: 1px solid #333 !important;
+        min-height: 20px !important;
+        page-break-inside: avoid;
+        font-size: 7px;
+    }
+
+    .day-cell.today {
+        background: #e3f2fd !important;
+        border: 2px solid #2196f3 !important;
+        font-weight: bold;
+    }
+
+    .day-cell.selected {
+        background: #4ecdc4 !important;
+        color: white !important;
+    }
+
+    .day-cell.invalid-day {
+        background: #f5f5f5 !important;
+        color: #ccc !important;
+        opacity: 0.3;
+    }
+
+    .month-label {
+        background: #f0f0f0 !important;
+        color: black !important;
+        font-weight: bold;
+        border: 1px solid #333;
+        padding: 4px 2px;
+        font-size: 9px;
+    }
+
+    .cell-symbols {
+        width: 100% !important;
+        height: 100% !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+
+    .symbol {
+        background: white !important;
+        border: 1px solid #333;
+        border-radius: 1px;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        text-align: center;
+        font-size: 2.5em !important;
+        line-height: 1;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+
+    /* Ensure symbols are visible */
+    .symbol[style*="background-color"] {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    /* Page breaks */
+    .calendar-container {
+        page-break-inside: avoid;
+    }
+    
+    /* Simple page break between years */
+    .year-section + .year-section {
+        page-break-before: always !important;
+    }
+
+    /* Print margins */
+    @page {
+        margin: 0.25in;
+        size: A4 landscape;
+    }
+
+    /* Hide any hover effects */
+    .day-cell:hover {
+        background: white !important;
+        transform: none !important;
+    }
+
+    /* Ensure the calendar fits on one page */
+    .year-calendar-grid,
+    .year-calendar-cells {
+        max-width: 100%;
+        overflow: visible;
+    }
+}
