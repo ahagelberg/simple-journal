@@ -35,7 +35,7 @@ class Calendar {
         // Number palette buttons
         document.querySelectorAll('.number-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                this.selectNumber(e.target);
+                this.selectNumber(btn);
             });
         });
 
@@ -237,18 +237,39 @@ class Calendar {
             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
         ];
 
+        const today = new Date();
+        const isCurrentYear = year === today.getFullYear();
+
         // Generate 12 rows (one for each month)
         for (let month = 0; month < 12; month++) {
-            // Month label
-            const monthLabel = document.createElement('div');
-            monthLabel.className = 'month-label';
-            monthLabel.textContent = monthNames[month];
-            grid.appendChild(monthLabel);
+            // Determine how many days to show for this month
+            let maxDays = 31;
+            if (isCurrentYear) {
+                const currentMonth = today.getMonth();
+                const currentDay = today.getDate();
+                
+                if (month > currentMonth) {
+                    // Future months in current year - don't show any days
+                    maxDays = 0;
+                } else if (month === currentMonth) {
+                    // Current month - only show days up to today
+                    maxDays = currentDay;
+                }
+            }
 
-            // Generate 31 cells for each month
-            for (let day = 1; day <= 31; day++) {
-                const cell = this.createYearCalendarCell(day, month, year);
-                grid.appendChild(cell);
+            // Only add month label and days if there are days to show
+            if (maxDays > 0) {
+                // Month label
+                const monthLabel = document.createElement('div');
+                monthLabel.className = 'month-label';
+                monthLabel.textContent = monthNames[month];
+                grid.appendChild(monthLabel);
+
+                // Generate cells for this month
+                for (let day = 1; day <= maxDays; day++) {
+                    const cell = this.createYearCalendarCell(day, month, year);
+                    grid.appendChild(cell);
+                }
             }
         }
     }
@@ -264,16 +285,9 @@ class Calendar {
             return cell;
         }
 
-        // Check if this is today
-        const today = new Date();
-        if (day === today.getDate() && 
-            month === today.getMonth() && 
-            year === today.getFullYear()) {
-            cell.classList.add('today');
-        }
 
         // Load numbers for this date (applies classes to cell)
-        // This will apply number-0 class if no data exists
+        // This will show default appearance if no data exists
         this.loadNumbersForDate(year, month, day);
 
         // Add click event listener
@@ -304,14 +318,14 @@ class Calendar {
             cell.classList.remove('count-display');
             
             // Apply the number class to the cell itself
-            if (number !== undefined && number !== null) {
-                // Ensure number is a valid integer between 0-5
-                const validNumber = Math.max(0, Math.min(5, parseInt(number) || 0));
+            if (number !== undefined && number !== null && number !== 0) {
+                // Ensure number is a valid integer between 1-5
+                const validNumber = Math.max(1, Math.min(5, parseInt(number)));
                 const className = `number-${validNumber}`;
                 cell.classList.add(className);
             } else {
-                // Empty cells default to 0 (white background)
-                cell.classList.add('number-0');
+                // Empty cells or cells with 0 have no number class (default appearance)
+                // No class is added, which gives the default white background
             }
         }
     }
@@ -360,7 +374,7 @@ class Calendar {
         } else {
             // If no date is selected, show a message
             if (window.app) {
-                window.app.showNotification('Please select a date first', 'info');
+                window.app.showNotification('Välj en datum först', 'info');
             }
         }
     }
@@ -371,6 +385,15 @@ class Calendar {
 
     loadCalendarData() {
         try {
+            // Check if this is the first run after build
+            const isFirstRun = this.checkFirstRun();
+            
+            if (isFirstRun) {
+                console.log('First run detected - clearing all stored data');
+                this.clearAllStoredData();
+                return {};
+            }
+            
             const data = localStorage.getItem('simpleCalendarData');
             const parsedData = data ? JSON.parse(data) : {};
             return parsedData;
@@ -380,7 +403,41 @@ class Calendar {
         }
     }
 
+    checkFirstRun() {
+        // Check if this is the first run by looking for a specific build marker
+        // This will be set during the build process
+        const buildMarker = localStorage.getItem('simpleJournalBuildMarker');
+        const currentBuildVersion = '1.0.0'; // This should match package.json version
+        
+        if (!buildMarker || buildMarker !== currentBuildVersion) {
+            // First run or version mismatch - clear everything
+            localStorage.setItem('simpleJournalBuildMarker', currentBuildVersion);
+            return true;
+        }
+        
+        return false;
+    }
 
+    clearAllStoredData() {
+        try {
+            // Clear all localStorage items related to the app
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.startsWith('simpleCalendar') || key.startsWith('simpleJournal'))) {
+                    keysToRemove.push(key);
+                }
+            }
+            
+            keysToRemove.forEach(key => {
+                localStorage.removeItem(key);
+            });
+            
+            console.log(`Cleared ${keysToRemove.length} stored items`);
+        } catch (error) {
+            console.error('Error clearing stored data:', error);
+        }
+    }
 
     saveCalendarData() {
         try {
@@ -407,16 +464,8 @@ class Calendar {
             this.autoSave.onDataChange();
         }
         
-        // Apply number class to the cell
-        const cell = document.querySelector(`[data-year="${year}"][data-month="${month}"][data-day="${day}"]`);
-        if (cell) {
-            // Remove all existing number classes
-            for (let i = 0; i <= 5; i++) {
-                cell.classList.remove(`number-${i}`);
-            }
-            // Apply the new number class
-            cell.classList.add(`number-${number}`);
-        }
+        // Re-render the cell to show the updated number (or cleared state)
+        this.loadNumbersForDate(year, month, day);
         
         // Recalculate consecutive zeros after data change
         this.calculateStreakSpacing();
@@ -486,7 +535,7 @@ class Calendar {
         
         const link = document.createElement('a');
         link.href = URL.createObjectURL(dataBlob);
-        link.download = `calendar-${this.currentYear}.json`;
+        link.download = `simple-journal-${new Date().toISOString().replace(/[:.]/g, '-').replace('Z', '').replace(/-\d{3}$/, '')}.json`;
         link.click();
         
         console.log('Calendar data exported');
@@ -505,7 +554,7 @@ class Calendar {
                         const data = JSON.parse(e.target.result);
                         this.loadImportedData(data);
                     } catch (error) {
-                        alert('Error importing file: Invalid JSON format');
+                        alert('Fel vid import av fil: Ogiltigt JSON-format');
                         console.error('Import error:', error);
                     }
                 };
@@ -530,7 +579,7 @@ class Calendar {
         
         // Show success message
         if (window.app) {
-            window.app.showNotification('Calendar data imported successfully', 'success');
+            window.app.showNotification('Kalenderdata importerad framgångsrikt', 'success');
         }
     }
 
@@ -567,18 +616,18 @@ class Calendar {
         this.closeSettings();
         
         if (window.app) {
-            window.app.showNotification('Settings saved', 'success');
+            window.app.showNotification('Inställningar sparade', 'success');
         }
     }
 
     clearAllData() {
-        if (confirm('Are you sure you want to clear all calendar data? This action cannot be undone.')) {
+        if (confirm('Är du säker på att du vill rensa all kalenderdata? Denna åtgärd kan inte ångras.')) {
             this.calendarData = {};
             this.saveCalendarData();
             this.renderAllYears();
             
             if (window.app) {
-                window.app.showNotification('All data cleared', 'success');
+                window.app.showNotification('All data rensad', 'success');
             }
         }
     }
@@ -598,7 +647,7 @@ class Calendar {
     clearSelectedCell() {
         if (!this.selectedDate) {
             if (window.app) {
-                window.app.showNotification('Please select a date first', 'info');
+                window.app.showNotification('Välj en datum först', 'info');
             }
             return;
         }
@@ -615,16 +664,11 @@ class Calendar {
             this.autoSave.onDataChange();
         }
         
-        // Apply number-0 class to the cell
-        const cell = document.querySelector(`[data-year="${year}"][data-month="${month}"][data-day="${day}"]`);
-        if (cell) {
-            // Remove all number classes
-            for (let i = 0; i <= 5; i++) {
-                cell.classList.remove(`number-${i}`);
-            }
-            // Apply number-0 class
-            cell.classList.add('number-0');
-        }
+        // Re-render the cell to show it as cleared (no number class)
+        this.loadNumbersForDate(year, month, day);
+        
+        // Recalculate consecutive zeros after data change
+        this.calculateStreakSpacing();
         
         console.log(`Cleared cell to 0: ${year}-${month + 1}-${day}`);
     }
@@ -632,7 +676,7 @@ class Calendar {
     backAndClear() {
         if (!this.selectedDate) {
             if (window.app) {
-                window.app.showNotification('Please select a date first', 'info');
+                window.app.showNotification('Välj en datum först', 'info');
             }
             return;
         }

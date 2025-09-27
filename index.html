@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Calendar</title>
+    <title>Simple Journal</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/print.css" media="print">
 </head>
@@ -17,34 +17,34 @@
         <!-- Toolbar at the top -->
         <section class="toolbar">
             <div class="action-buttons">
-                <button class="action-btn clear-btn" id="clear-cell-btn" title="Clear Cell (Delete)">⌫</button>
-                <button class="action-btn back-btn" id="back-cell-btn" title="Back & Clear (Backspace)">←</button>
+                <button class="action-btn clear-btn" id="clear-cell-btn" title="Rensa cell (Delete)">⌫</button>
+                <button class="action-btn back-btn" id="back-cell-btn" title="Tillbaka & Rensa (Backspace)">←</button>
             </div>
             <div class="number-buttons">
-                <button class="number-btn number-0" data-number="0" title="Number 0 (0)">
+                <button class="number-btn number-0" data-number="0" title="Nummer 0 (0)">
                     <span class="button-number">0</span>
                 </button>
-                <button class="number-btn number-1" data-number="1" title="Number 1 (1)">
+                <button class="number-btn number-1" data-number="1" title="Nummer 1 (1)">
                     <span class="button-number">1</span>
                 </button>
-                <button class="number-btn number-2" data-number="2" title="Number 2 (2)">
+                <button class="number-btn number-2" data-number="2" title="Nummer 2 (2)">
                     <span class="button-number">2</span>
                 </button>
-                <button class="number-btn number-3" data-number="3" title="Number 3 (3)">
+                <button class="number-btn number-3" data-number="3" title="Nummer 3 (3)">
                     <span class="button-number">3</span>
                 </button>
-                <button class="number-btn number-4" data-number="4" title="Number 4 (4)">
+                <button class="number-btn number-4" data-number="4" title="Nummer 4 (4)">
                     <span class="button-number">4</span>
                 </button>
-                <button class="number-btn number-5" data-number="5" title="Number 5 (5)">
+                <button class="number-btn number-5" data-number="5" title="Nummer 5 (5)">
                     <span class="button-number">5</span>
                 </button>
             </div>
             <div class="app-buttons">
-                <button id="export-json" class="action-btn">Export JSON</button>
-                <button id="import-json" class="action-btn">Import JSON</button>
-                <button id="print-calendar" class="action-btn">Print</button>
-                <button id="settings-btn" class="action-btn">Settings</button>
+                <button id="export-json" class="action-btn">Exportera JSON</button>
+                <button id="import-json" class="action-btn">Importera JSON</button>
+                <button id="print-calendar" class="action-btn">Skriv ut</button>
+                <button id="settings-btn" class="action-btn">Inställ- ningar</button>
             </div>
         </section>
 
@@ -60,28 +60,28 @@
         <div id="settings-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Settings</h2>
+                    <h2>Inställningar</h2>
                     <button id="close-settings" class="close-btn">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="setting-group">
                         <label for="auto-advance-toggle">
                             <input type="checkbox" id="auto-advance-toggle" checked>
-                            Auto-advance to next day after adding symbol
+                            Automatiskt hoppa fram till nästa dag
                         </label>
                     </div>
                     <div class="setting-group">
                         <label for="auto-save-toggle">
                             <input type="checkbox" id="auto-save-toggle" checked>
-                            Auto-save changes
+                            Spara automtiskt
                         </label>
                     </div>
                     <div class="setting-group">
-                        <button id="clear-data-btn" class="danger-btn">Clear All Data</button>
+                        <button id="clear-data-btn" class="danger-btn">Rensa all data</button>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="save-settings" class="action-btn">Save Settings</button>
+                    <button id="save-settings" class="action-btn">Spara</button>
                 </div>
             </div>
         </div>

@@ -57,14 +57,14 @@ class SimpleCalendarApp {
         // Number shortcuts (0-5) - direct key presses
         if (event.key >= '0' && event.key <= '5') {
             event.preventDefault();
-            this.selectNumberByShortcut(`Number ${event.key}`);
+            this.selectNumberByShortcut(`Nummer ${event.key}`);
             return;
         }
 
         // Space bar acts as 0
         if (event.key === ' ') {
             event.preventDefault();
-            this.selectNumberByShortcut('Number 0');
+            this.selectNumberByShortcut('Nummer 0');
             return;
         }
 
@@ -178,7 +178,7 @@ class SimpleCalendarApp {
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            link.download = `calendar-${new Date().toISOString().split('T')[0]}.json`;
+            link.download = `simple-journal-${new Date().toISOString().replace(/[:.]/g, '-').replace('Z', '').replace(/-\d{3}$/, '')}.json`;
             link.click();
             
             console.log('Calendar data exported');
