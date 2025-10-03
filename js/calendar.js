@@ -312,15 +312,15 @@ class Calendar {
         
         if (cell) {
             // Remove all number classes and count display
-            for (let i = 0; i <= 5; i++) {
+            for (let i = 0; i <= 6; i++) {
                 cell.classList.remove(`number-${i}`);
             }
             cell.classList.remove('count-display');
             
             // Apply the number class to the cell itself
             if (number !== undefined && number !== null && number !== 0) {
-                // Ensure number is a valid integer between 1-5
-                const validNumber = Math.max(1, Math.min(5, parseInt(number)));
+                // Ensure number is a valid integer between 1-6
+                const validNumber = Math.max(1, Math.min(6, parseInt(number)));
                 const className = `number-${validNumber}`;
                 cell.classList.add(className);
             } else {
@@ -348,15 +348,6 @@ class Calendar {
     }
 
     selectNumber(button) {
-        // Remove previous number selection
-        const previousSelected = document.querySelector('.number-btn.selected');
-        if (previousSelected) {
-            previousSelected.classList.remove('selected');
-        }
-
-        // Add selection to current number
-        button.classList.add('selected');
-        
         // Store just the number value
         const number = parseInt(button.dataset.number);
         this.selectedNumber = number;
@@ -374,7 +365,7 @@ class Calendar {
         } else {
             // If no date is selected, show a message
             if (window.app) {
-                window.app.showNotification('Välj en datum först', 'info');
+                window.app.showNotification('Välj ett datum först', 'info');
             }
         }
     }
@@ -385,15 +376,6 @@ class Calendar {
 
     loadCalendarData() {
         try {
-            // Check if this is the first run after build
-            const isFirstRun = this.checkFirstRun();
-            
-            if (isFirstRun) {
-                console.log('First run detected - clearing all stored data');
-                this.clearAllStoredData();
-                return {};
-            }
-            
             const data = localStorage.getItem('simpleCalendarData');
             const parsedData = data ? JSON.parse(data) : {};
             return parsedData;
@@ -403,41 +385,6 @@ class Calendar {
         }
     }
 
-    checkFirstRun() {
-        // Check if this is the first run by looking for a specific build marker
-        // This will be set during the build process
-        const buildMarker = localStorage.getItem('simpleJournalBuildMarker');
-        const currentBuildVersion = '1.0.0'; // This should match package.json version
-        
-        if (!buildMarker || buildMarker !== currentBuildVersion) {
-            // First run or version mismatch - clear everything
-            localStorage.setItem('simpleJournalBuildMarker', currentBuildVersion);
-            return true;
-        }
-        
-        return false;
-    }
-
-    clearAllStoredData() {
-        try {
-            // Clear all localStorage items related to the app
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && (key.startsWith('simpleCalendar') || key.startsWith('simpleJournal'))) {
-                    keysToRemove.push(key);
-                }
-            }
-            
-            keysToRemove.forEach(key => {
-                localStorage.removeItem(key);
-            });
-            
-            console.log(`Cleared ${keysToRemove.length} stored items`);
-        } catch (error) {
-            console.error('Error clearing stored data:', error);
-        }
-    }
 
     saveCalendarData() {
         try {

@@ -1,0 +1,62 @@
+{
+  "name": "simple-journal",
+  "version": "1.0.1",
+  "description": "A simple calendar journal application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "dist": "electron-builder --publish=never"
+  },
+  "keywords": [
+    "calendar",
+    "journal",
+    "electron",
+    "desktop"
+  ],
+  "author": "Simple Journal",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.simplejournal.app",
+    "productName": "Simple Journal",
+    "icon": "assets/icon.ico",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules",
+      "!dist",
+      "!*.md"
+    ],
+    "asarUnpack": [],
+    "afterPack": "./scripts/remove-unused-locales.js",
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "extraResources": [],
+    "compression": "maximum",
+    "removePackageKeywords": true,
+    "removePackageScripts": true,
+    "extraMetadata": {
+      "main": "main.js"
+    }
+  },
+  "dependencies": {
+    "7zip": "^0.0.6",
+    "electron-packager": "^17.1.2"
+  }
+}

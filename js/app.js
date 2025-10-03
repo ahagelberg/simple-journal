@@ -22,9 +22,6 @@ class SimpleCalendarApp {
         // Setup global event listeners
         this.setupGlobalEventListeners();
         
-        // Load initial data
-        this.loadInitialData();
-        
         console.log('Simple Calendar App initialized successfully');
     }
 
@@ -54,8 +51,8 @@ class SimpleCalendarApp {
     }
 
     handleKeyboardShortcuts(event) {
-        // Number shortcuts (0-5) - direct key presses
-        if (event.key >= '0' && event.key <= '5') {
+        // Number shortcuts (0-6) - direct key presses
+        if (event.key >= '0' && event.key <= '6' && ! event.ctrlKey) {
             event.preventDefault();
             this.selectNumberByShortcut(`Nummer ${event.key}`);
             return;
@@ -134,16 +131,6 @@ class SimpleCalendarApp {
         if (numberBtn && window.calendar) {
             window.calendar.selectNumber(numberBtn);
         }
-    }
-
-    loadInitialData() {
-        // Load calendar data from localStorage
-        console.log('Loading initial data...');
-        
-        // Calendar data is loaded in calendar.js
-        // Symbol palette will be loaded in Phase 2
-        
-        console.log('Initial data loaded');
     }
 
     saveBeforeUnload() {
