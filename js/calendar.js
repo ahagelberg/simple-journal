@@ -13,6 +13,7 @@ class Calendar {
         this.calendarData = this.loadCalendarData();
         this.autoSave = null;
         this.autoAdvance = true;
+        this.noteCounter = 1; // Internal counter for note numbering
         this.loadSettings();
         this.init();
     }
@@ -21,6 +22,7 @@ class Calendar {
         this.setupEventListeners();
         this.renderAllYears();
         this.initializeAutoSave();
+        this.setupPrintMediaListener();
     }
 
     initializeAutoSave() {
@@ -37,6 +39,11 @@ class Calendar {
             btn.addEventListener('click', (e) => {
                 this.selectNumber(btn);
             });
+        });
+
+        // Special symbol button
+        document.getElementById('add-special-btn').addEventListener('click', (e) => {
+            this.selectSpecialSymbol();
         });
 
         // Action buttons
@@ -110,11 +117,16 @@ class Calendar {
         }, 100);
     }
 
+
     reloadAllCells() {
-        // Only load cells that have data (not 0 or empty)
+        // Load all cells that have data (including note-only entries and special symbols)
         Object.keys(this.calendarData).forEach(dateKey => {
-            const number = this.calendarData[dateKey];
-            if (number !== undefined && number !== null && number !== 0) {
+            const dayData = this.calendarData[dateKey];
+            const number = dayData.value;
+            const note = dayData.note;
+            
+            // Load cell if it has a number OR a note
+            if ((number !== undefined && number !== null && number !== 0) || (note && note.trim() !== '')) {
                 // Parse the date key to get year, month, day
                 const [year, month, day] = dateKey.split('-').map(Number);
                 this.loadNumbersForDate(year, month - 1, day); // month is 0-indexed in JS
@@ -140,8 +152,10 @@ class Calendar {
         for (let i = 0; i < allDates.length; i++) {
             const { year, month, day } = allDates[i];
             const dateKey = this.getDateKey(year, month, day);
-            const number = this.calendarData[dateKey];
-            const isZero = number === undefined || number === null || number === 0;
+            const dayData = this.calendarData[dateKey];
+            const number = dayData ? dayData.value : undefined;
+            // Treat special symbol (period) as empty for streak counting
+            const isZero = number === undefined || number === null || number === 0 || number === '.';
 
             if (isZero) {
                 currentStreak++;
@@ -216,7 +230,60 @@ class Calendar {
         // Add calendar cells
         this.generateYearCalendarCells(yearGrid, year);
 
+        // Add notes section for this year
+        this.addYearNotesSection(yearSection, year);
+
         container.appendChild(yearSection);
+    }
+
+    getNotesForYear(year) {
+        const notes = [];
+        Object.keys(this.calendarData).forEach(dateKey => {
+            const [noteYear] = dateKey.split('-').map(Number);
+            if (noteYear === year) {
+                const dayData = this.calendarData[dateKey];
+                if (dayData && dayData.note && dayData.note.trim() !== '') {
+                    const [year, month, day] = dateKey.split('-').map(Number);
+                    notes.push({
+                        date: new Date(year, month - 1, day),
+                        note: dayData.note,
+                        dateKey: dateKey
+                    });
+                }
+            }
+        });
+        
+        // Sort notes by date
+        return notes.sort((a, b) => a.date - b.date);
+    }
+
+    addYearNotesSection(yearSection, year) {
+        const notes = this.getNotesForYear(year);
+        if (notes.length === 0) return;
+
+        const notesSection = document.createElement('div');
+        notesSection.className = 'year-notes';
+        
+        const notesTitle = document.createElement('h3');
+        notesTitle.className = 'notes-title';
+        notesTitle.textContent = 'Anteckningar';
+        notesSection.appendChild(notesTitle);
+
+        const notesList = document.createElement('ol');
+        notesList.className = 'notes-list';
+        
+        notes.forEach((noteData, index) => {
+            const noteItem = document.createElement('li');
+            noteItem.className = 'note-item';
+            
+            const dateStr = noteData.date.toISOString().split('T')[0]; // YYYY-MM-DD format
+            
+            noteItem.innerHTML = `<span class="note-date">${dateStr}:</span> <span class="note-text">${noteData.note}</span>`;
+            notesList.appendChild(noteItem);
+        });
+        
+        notesSection.appendChild(notesList);
+        yearSection.appendChild(notesSection);
     }
 
     addDayHeaders(grid) {
@@ -309,29 +376,135 @@ class Calendar {
 
     loadNumbersForDate(year, month, day) {
         const dateKey = this.getDateKey(year, month, day);
-        const number = this.calendarData[dateKey];
+        const dayData = this.calendarData[dateKey];
+        const number = dayData ? dayData.value : undefined;
+        const note = dayData ? dayData.note : null;
 
         // Find the cell directly
         const cell = document.querySelector(`[data-year="${year}"][data-month="${month}"][data-day="${day}"]`);
         
         if (cell) {
-            // Remove all number classes and count display
+            // Remove all number classes, count display, and note indicators
             for (let i = 0; i <= 6; i++) {
                 cell.classList.remove(`number-${i}`);
             }
             cell.classList.remove('count-display');
             
+            // Remove existing note indicator
+            const existingNoteIndicator = cell.querySelector('.note-indicator');
+            if (existingNoteIndicator) {
+                existingNoteIndicator.remove();
+            }
+            
             // Apply the number class to the cell itself
             if (number !== undefined && number !== null && number !== 0) {
-                // Ensure number is a valid integer between 1-6
-                const validNumber = Math.max(1, Math.min(6, parseInt(number)));
-                const className = `number-${validNumber}`;
-                cell.classList.add(className);
+                // Handle special symbol (period) as special class
+                if (number === '.') {
+                    cell.classList.add('special');
+                } else {
+                    // Ensure number is a valid integer between 1-6
+                    const validNumber = Math.max(1, Math.min(6, parseInt(number)));
+                    const className = `number-${validNumber}`;
+                    cell.classList.add(className);
+                }
             } else {
                 // Empty cells or cells with 0 have no number class (default appearance)
                 // No class is added, which gives the default white background
             }
+            
+            // Add note indicator if there's a note
+            if (note && note.trim() !== '') {
+                const noteIndicator = document.createElement('div');
+                noteIndicator.className = 'note-indicator';
+                
+                // Show number in print view, 'i' in regular view
+                const isPrintView = window.matchMedia('print').matches;
+                noteIndicator.textContent = isPrintView ? this.getNoteNumberForDate(year, month, day) : 'i';
+                
+                cell.appendChild(noteIndicator);
+                
+                // Add hover events for popup
+                this.addNotePopupEvents(cell, note);
+            }
         }
+    }
+
+    getNoteNumberForDate(year, month, day) {
+        const notes = this.getNotesForYear(year);
+        const dateKey = this.getDateKey(year, month, day);
+        
+        const noteIndex = notes.findIndex(note => note.dateKey === dateKey);
+        return noteIndex >= 0 ? (noteIndex + 1).toString() : '1';
+    }
+
+    addNotePopupEvents(cell, note) {
+        let popup = null;
+        let showTimeout = null;
+        let hideTimeout = null;
+
+        const showPopup = () => {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+                hideTimeout = null;
+            }
+            
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.className = 'note-popup';
+                popup.textContent = note;
+                document.body.appendChild(popup);
+            }
+            
+            const cellRect = cell.getBoundingClientRect();
+            const popupRect = popup.getBoundingClientRect();
+            
+            // Position popup above the cell
+            popup.style.left = (cellRect.left + cellRect.width / 2 - popupRect.width / 2) + 'px';
+            popup.style.top = (cellRect.top - popupRect.height - 10) + 'px';
+            
+            // Show popup with animation
+            requestAnimationFrame(() => {
+                popup.classList.add('show');
+            });
+        };
+
+        const hidePopup = () => {
+            if (showTimeout) {
+                clearTimeout(showTimeout);
+                showTimeout = null;
+            }
+            
+            if (popup) {
+                popup.classList.remove('show');
+                hideTimeout = setTimeout(() => {
+                    if (popup && popup.parentNode) {
+                        popup.parentNode.removeChild(popup);
+                    }
+                    popup = null;
+                }, 200); // Match CSS transition duration
+            }
+        };
+
+        // Mouse enter with delay
+        cell.addEventListener('mouseenter', () => {
+            showTimeout = setTimeout(showPopup, 300);
+        });
+
+        // Mouse leave
+        cell.addEventListener('mouseleave', () => {
+            hidePopup();
+        });
+
+        // Clean up on cell removal
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && !document.body.contains(cell)) {
+                    hidePopup();
+                    observer.disconnect();
+                }
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     selectDate(cell, year, month, day) {
@@ -354,17 +527,24 @@ class Calendar {
     selectNumber(button) {
         // Store just the number value
         const number = parseInt(button.dataset.number);
-        this.selectedNumber = number;
-
         console.log(`Selected number: ${number}`);
+        this.applySelectedValue(number);
+    }
 
-        // If there's a selected date, automatically add the number to it
+    selectSpecialSymbol() {
+        console.log('Selected special symbol');
+        this.applySelectedValue('.');
+    }
+
+    applySelectedValue(value) {
+        this.selectedNumber = value;
+        // If there's a selected date, automatically add the value to it
         if (this.selectedDate) {
             this.addNumberToDate(
                 this.selectedDate.year, 
                 this.selectedDate.month, 
                 this.selectedDate.day, 
-                number
+                value
             );
         } else {
             // If no date is selected, show a message
@@ -398,11 +578,38 @@ class Calendar {
         try {
             const data = localStorage.getItem('simpleCalendarData');
             const parsedData = data ? JSON.parse(data) : {};
-            return parsedData;
+            
+            // Migrate old format to new format if needed
+            return this.migrateDataFormat(parsedData);
         } catch (error) {
             console.error('Error loading calendar data:', error);
             return {};
         }
+    }
+
+    migrateDataFormat(data) {
+        const migratedData = {};
+        
+        Object.keys(data).forEach(dateKey => {
+            const value = data[dateKey];
+            
+            // Check if this is old format (direct number) or new format (object)
+            if (typeof value === 'number') {
+                // Old format: migrate to new format (only include note if it exists)
+                migratedData[dateKey] = {
+                    value: value
+                };
+            } else if (typeof value === 'object' && value !== null) {
+                // New format: clean up null notes
+                const cleanedData = { value: value.value };
+                if (value.note && value.note.trim() !== '') {
+                    cleanedData.note = value.note;
+                }
+                migratedData[dateKey] = cleanedData;
+            }
+        });
+        
+        return migratedData;
     }
 
 
@@ -422,7 +629,17 @@ class Calendar {
         if (number === 0) {
             delete this.calendarData[dateKey];
         } else {
-            this.calendarData[dateKey] = number;
+            // Get existing day data or create new structure
+            const existingData = this.calendarData[dateKey];
+            if (existingData) {
+                // Update existing data structure
+                existingData.value = number;
+            } else {
+                // Create new data structure (only include note if it exists)
+                this.calendarData[dateKey] = {
+                    value: number
+                };
+            }
         }
         this.saveCalendarData();
         
@@ -445,9 +662,40 @@ class Calendar {
 
     addNoteToDate(year, month, day, note) {
         const dateKey = this.getDateKey(year, month, day);
-        //this.calendarData[dateKey] = note;
-        // TODO: Change calendar format to include notes
+        
+        // Get existing day data or create new structure
+        const existingData = this.calendarData[dateKey];
+        if (existingData) {
+            // Update existing data structure
+            if (note && note.trim() !== '') {
+                existingData.note = note;
+            } else {
+                // Remove note if it's empty
+                delete existingData.note;
+                // If no value and no note, remove the entire entry
+                if (!existingData.value) {
+                    delete this.calendarData[dateKey];
+                }
+            }
+        } else {
+            // Create new data structure with note (only if note is not empty)
+            if (note && note.trim() !== '') {
+                this.calendarData[dateKey] = {
+                    value: 0, // Default value for note-only entries
+                    note: note
+                };
+            }
+        }
+        
         this.saveCalendarData();
+        
+        // Trigger auto-save
+        if (this.autoSave) {
+            this.autoSave.onDataChange();
+        }
+        
+        // Re-render the cell to show the updated note indicator
+        this.loadNumbersForDate(year, month, day);
     }
 
     advanceToNextDay(year, month, day) {
@@ -540,7 +788,8 @@ class Calendar {
 
     loadImportedData(data) {
         if (data.calendarData) {
-            this.calendarData = data.calendarData;
+            // Migrate imported data to new format if needed
+            this.calendarData = this.migrateDataFormat(data.calendarData);
             this.saveCalendarData();
         }
         
@@ -839,6 +1088,31 @@ class Calendar {
         } catch (error) {
             console.error('Error restoring selected cell:', error);
         }
+    }
+
+    setupPrintMediaListener() {
+        const printMediaQuery = window.matchMedia('print');
+        
+        const handlePrintChange = (mediaQuery) => {
+            // Update all note indicators when switching between print and regular view
+            document.querySelectorAll('.note-indicator').forEach(indicator => {
+                const cell = indicator.closest('.day-cell');
+                if (cell) {
+                    const year = parseInt(cell.dataset.year);
+                    const month = parseInt(cell.dataset.month);
+                    const day = parseInt(cell.dataset.day);
+                    
+                    indicator.textContent = mediaQuery.matches ? 
+                        this.getNoteNumberForDate(year, month, day) : 'i';
+                }
+            });
+        };
+
+        // Listen for print media changes
+        printMediaQuery.addEventListener('change', handlePrintChange);
+        
+        // Initial check
+        handlePrintChange(printMediaQuery);
     }
 
     addScrollListener() {

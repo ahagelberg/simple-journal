@@ -24,22 +24,7 @@ class AutoSave {
     createSaveStatusIndicator() {
         // Create a subtle save status indicator
         this.saveStatusElement = document.createElement('div');
-        this.saveStatusElement.className = 'save-status';
-        this.saveStatusElement.style.cssText = `
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #4ecdc4;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
-            pointer-events: none;
-        `;
+        this.saveStatusElement.className = 'auto-save-status';
         this.saveStatusElement.textContent = 'Saved';
         document.body.appendChild(this.saveStatusElement);
     }

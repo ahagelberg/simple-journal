@@ -58,6 +58,15 @@ class SimpleCalendarApp {
             return;
         }
 
+        // Special symbol shortcut (7 key)
+        if (event.key === '7' && ! event.ctrlKey) {
+            event.preventDefault();
+            if (window.calendar) {
+                window.calendar.selectSpecialSymbol();
+            }
+            return;
+        }
+
         // Space bar acts as 0
         if (event.key === ' ') {
             event.preventDefault();
@@ -189,19 +198,6 @@ class SimpleCalendarApp {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'error' ? '#ff6b6b' : type === 'success' ? '#4ecdc4' : '#45b7d1'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-            font-size: 14px;
-            font-weight: 500;
-        `;
         
         document.body.appendChild(notification);
         
