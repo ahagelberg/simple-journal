@@ -117,6 +117,11 @@ body {
     font-size: 24px;
 }
 
+#add-note-btn {
+    font-size: 50px;
+    width: 60px;
+}
+
 /* Calendar container styles */
 .calendar-container {
     flex: 1;

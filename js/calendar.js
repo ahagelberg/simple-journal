@@ -48,6 +48,10 @@ class Calendar {
             this.backAndClear();
         });
 
+        document.getElementById('add-note-btn').addEventListener('click', () => {
+            this.addNote();
+        });
+
         // Action buttons
         document.getElementById('export-json').addEventListener('click', () => {
             this.exportData();
@@ -370,6 +374,22 @@ class Calendar {
         }
     }
 
+    addNote() {
+        if (this.selectedDate) {
+            console.log(`Adding note to date: ${this.selectedDate.year}-${this.selectedDate.month + 1}-${this.selectedDate.day}`);
+            // Open an input dialog to add a note
+            const note = prompt('Lägg till anteckning');
+            if (note) {
+                this.addNoteToDate(this.selectedDate.year, this.selectedDate.month, this.selectedDate.day, note);
+            }
+        } else {
+            // If no date is selected, show a message
+            if (window.app) {
+                window.app.showNotification('Välj ett datum först', 'info');
+            }
+        }
+    }
+
     getDateKey(year, month, day) {
         return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     }
@@ -421,6 +441,13 @@ class Calendar {
         if (this.autoAdvance) {
             this.advanceToNextDay(year, month, day);
         }
+    }
+
+    addNoteToDate(year, month, day, note) {
+        const dateKey = this.getDateKey(year, month, day);
+        //this.calendarData[dateKey] = note;
+        // TODO: Change calendar format to include notes
+        this.saveCalendarData();
     }
 
     advanceToNextDay(year, month, day) {

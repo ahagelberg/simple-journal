@@ -65,6 +65,14 @@ class SimpleCalendarApp {
             return;
         }
 
+        if (event.key === 'i') {
+            event.preventDefault();
+            if (window.calendar) {
+                window.calendar.addNote();
+            }
+            return;
+        }
+
         if (event.ctrlKey) {
             switch (event.key) {
                 case 's':
