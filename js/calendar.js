@@ -59,6 +59,41 @@ class Calendar {
             this.addNote();
         });
 
+        // Note modal event listeners
+        document.getElementById('close-note').addEventListener('click', () => {
+            this.closeNoteModal();
+        });
+
+        document.getElementById('cancel-note').addEventListener('click', () => {
+            this.closeNoteModal();
+        });
+
+        document.getElementById('save-note').addEventListener('click', () => {
+            this.saveNote();
+        });
+
+        document.getElementById('delete-note').addEventListener('click', () => {
+            this.deleteNote();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('note-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'note-modal') {
+                this.closeNoteModal();
+            }
+        });
+
+        // Handle keyboard shortcuts in modal
+        document.getElementById('note-text').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                this.saveNote();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                this.closeNoteModal();
+            }
+        });
+
         // Action buttons
         document.getElementById('export-json').addEventListener('click', () => {
             this.exportData();
@@ -557,17 +592,68 @@ class Calendar {
     addNote() {
         if (this.selectedDate) {
             console.log(`Adding note to date: ${this.selectedDate.year}-${this.selectedDate.month + 1}-${this.selectedDate.day}`);
-            // Open an input dialog to add a note
-            const note = prompt('Lägg till anteckning');
-            if (note) {
-                this.addNoteToDate(this.selectedDate.year, this.selectedDate.month, this.selectedDate.day, note);
-            }
+            
+            // Get existing note if any
+            const dateKey = this.getDateKey(this.selectedDate.year, this.selectedDate.month, this.selectedDate.day);
+            const existingData = this.calendarData[dateKey];
+            const existingNote = existingData && existingData.note ? existingData.note : '';
+            
+            // Pre-fill the textarea with existing note
+            document.getElementById('note-text').value = existingNote;
+            
+            // Show the modal
+            document.getElementById('note-modal').style.display = 'block';
+            
+            // Disable global keyboard shortcuts
+            this.disableGlobalShortcuts();
+            
+            // Focus the textarea
+            setTimeout(() => {
+                document.getElementById('note-text').focus();
+            }, 100);
         } else {
             // If no date is selected, show a message
             if (window.app) {
                 window.app.showNotification('Välj ett datum först', 'info');
             }
         }
+    }
+
+    closeNoteModal() {
+        document.getElementById('note-modal').style.display = 'none';
+        document.getElementById('note-text').value = '';
+        
+        // Re-enable global keyboard shortcuts
+        this.enableGlobalShortcuts();
+    }
+
+    saveNote() {
+        const noteText = document.getElementById('note-text').value.trim();
+        
+        if (this.selectedDate) {
+            this.addNoteToDate(this.selectedDate.year, this.selectedDate.month, this.selectedDate.day, noteText);
+        }
+        
+        this.closeNoteModal();
+    }
+
+    deleteNote() {
+        if (this.selectedDate) {
+            // Remove the note by setting it to empty string
+            this.addNoteToDate(this.selectedDate.year, this.selectedDate.month, this.selectedDate.day, '');
+        }
+        
+        this.closeNoteModal();
+    }
+
+    disableGlobalShortcuts() {
+        // Add a class to the body to indicate modal is open
+        document.body.classList.add('modal-open');
+    }
+
+    enableGlobalShortcuts() {
+        // Remove the class to re-enable shortcuts
+        document.body.classList.remove('modal-open');
     }
 
     getDateKey(year, month, day) {

@@ -51,6 +51,11 @@ class SimpleCalendarApp {
     }
 
     handleKeyboardShortcuts(event) {
+        // Don't handle shortcuts when modal is open
+        if (document.body.classList.contains('modal-open')) {
+            return;
+        }
+        
         // Number shortcuts (0-6) - direct key presses
         if (event.key >= '0' && event.key <= '6' && ! event.ctrlKey) {
             event.preventDefault();

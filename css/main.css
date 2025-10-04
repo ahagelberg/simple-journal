@@ -857,3 +857,42 @@ body {
     z-index: 1000;
     pointer-events: none;
 }
+
+/* Note modal styles */
+#note-text {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+}
+
+#note-text:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Note modal footer button layout */
+#note-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#note-modal .modal-footer .action-btn {
+    min-width: 80px;
+}
+
+#note-modal .modal-footer .action-btn.danger {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+#note-modal .modal-footer .action-btn.danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}

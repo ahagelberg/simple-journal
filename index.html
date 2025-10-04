@@ -43,7 +43,7 @@
                     <span class="button-number">6</span>
                 </button>
                 <button id="add-special-btn" class="symbol-btn" data-number="7" title="Special Symbol (7)">&#9673;</button>
-                <button id="add-note-btn" class="symbol-btn">&#9432;</button>
+                <button id="add-note-btn" class="symbol-btn" title="Add Note (i)">&#9432;</button>
             </div>
             <div class="app-buttons">
                 <button id="export-json" class="action-btn">Exportera till fil</button>
@@ -87,6 +87,24 @@
                 </div>
                 <div class="modal-footer">
                     <button id="save-settings" class="action-btn">Spara</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Note Modal -->
+        <div id="note-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Lägg till anteckning</h2>
+                    <button id="close-note" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="note-text" placeholder="Skriv din anteckning här..." rows="4"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button id="delete-note" class="action-btn danger">Radera</button>
+                    <button id="cancel-note" class="action-btn">Avbryt</button>
+                    <button id="save-note" class="action-btn">Spara</button>
                 </div>
             </div>
         </div>
