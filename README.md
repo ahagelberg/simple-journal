@@ -1,76 +1,129 @@
-# Simple Calendar
+# Simple Journal
 
-A simple, lightweight calendar application for marking days with symbols and colors.
+A comprehensive journal application for tracking daily activities with numbers, symbols, and notes.
 
-## Current Status: Phase 1 Complete ✅
+## Current Status: Feature Complete ✅
 
-### Implemented Features:
-- ✅ Full year calendar view (months as rows, days as columns)
-- ✅ Compact grid layout with small, closely spaced squares
-- ✅ Symbol palette at the top with cross symbols and additional symbols
-- ✅ Year navigation (previous/next year buttons)
-- ✅ Today highlighting
-- ✅ Symbol insertion with click-to-add functionality
-- ✅ Keyboard shortcuts for all symbols (Ctrl+1-0, Ctrl+Q-P)
-- ✅ Basic localStorage integration
-- ✅ Print-friendly layout (landscape orientation)
-- ✅ Basic export functionality (JSON)
-- ✅ Clean, modern UI design
+### Core Features:
+- ✅ **Full Year Calendar View**: Months as rows, days as columns with compact grid layout
+- ✅ **Number System**: 0-6 number buttons for daily tracking (0 = empty, 1-6 = activity levels)
+- ✅ **Special Symbol**: Period (.) symbol with bullet (◉) display and gray background
+- ✅ **Note System**: Add, edit, and delete notes for any day with hover popups
+- ✅ **Year Navigation**: Previous/next year buttons with keyboard shortcuts
+- ✅ **Today Highlighting**: Current date is visually highlighted
+- ✅ **Streak Counting**: Automatic streak calculation with proper spacing
+- ✅ **Data Management**: Export/import JSON with backward compatibility
+- ✅ **Print Support**: Print-optimized layout with numbered notes as footnotes
+- ✅ **Auto-Save**: Automatic data saving with visual indicators
+- ✅ **Keyboard Shortcuts**: Full keyboard support for all functions
+- ✅ **Electron App**: Desktop application with custom modal dialogs
 
 ### File Structure:
 ```
-simple-calendar/
-├── index.html          # Main HTML structure
+simple-journal/
+├── index.html          # Main HTML structure with modal dialogs
 ├── css/
-│   ├── main.css        # Main styles
-│   └── print.css       # Print-specific styles
+│   ├── main.css        # Main styles with responsive design
+│   └── print.css       # Print-specific styles with footnotes
 ├── js/
-│   ├── app.js          # Main application controller
-│   └── calendar.js     # Calendar functionality
+│   ├── app.js          # Main application controller with keyboard shortcuts
+│   ├── calendar.js     # Calendar functionality with note system
+│   └── auto-save.js    # Auto-save functionality with visual indicators
+├── package.json         # Electron build configuration
 └── README.md           # This file
 ```
 
 ## How to Use:
 
-1. **Open the application**: Open `index.html` in any modern web browser
+### **Desktop Application**:
+1. **Run the app**: Execute `Simple Journal.exe` from the dist folder
 2. **Navigate years**: Use the ← → buttons or Ctrl+Left/Right arrow keys
-3. **Select symbols**: Click on symbol palette buttons or use keyboard shortcuts
-4. **Add symbols to dates**: Click on a calendar cell to add the selected symbol
-5. **Export data**: Click "Export JSON" to download your calendar data
-6. **Print**: Click "Print" or use Ctrl+P to print the calendar
+3. **Select numbers**: Click number buttons (0-6) or press number keys (0-6)
+4. **Special symbol**: Click the special button or press '7' key for period (.)
+5. **Add notes**: Click the note button (i) or press 'i' key, then type your note
+6. **Edit notes**: Click on existing notes to edit them
+7. **Delete notes**: Use the "Radera" button in the note modal
+8. **Export data**: Click "Export JSON" to download your calendar data
+9. **Print**: Click "Print" or use Ctrl+P to print with numbered footnotes
 
-## Symbol Palette:
+### **Web Browser**:
+1. **Open**: Open `index.html` in any modern web browser
+2. **Same functionality**: All features work identically in the browser
 
-- **Cross Symbols**: ✖ (large full), ✖ (large dim), ✕ (medium full), ✕ (medium dim), × (small full)
-- **Additional Symbols**: ●, ▲, ■, ◆, ★
-- **Custom Symbols**: A, B, C, D, E, F, G, H, I, J
-- **Keyboard Shortcuts**: Ctrl+1-0 for cross/additional symbols, Ctrl+Q-P for custom symbols
+## Number System:
 
-## Current Limitations:
+- **0**: Empty day (space bar shortcut)
+- **1-6**: Activity levels (number key shortcuts)
+- **Special (.)**: Period symbol with bullet (◉) display (7 key shortcut)
+- **Notes**: Add detailed notes with hover popups (i key shortcut)
 
-- No auto-save functionality (Phase 4)
-- No custom symbol management (add/edit/remove)
-- No auto-advance after symbol insertion
-- No data import functionality
+## Keyboard Shortcuts:
 
-## Next Steps (Phase 2):
+- **Numbers**: 0-6 keys for number selection
+- **Special**: 7 key for period symbol
+- **Notes**: 'i' key to add/edit notes
+- **Navigation**: Ctrl+Left/Right for year navigation
+- **Modal**: Ctrl+Enter to save, Escape to cancel
 
-- Add auto-advance functionality after symbol insertion
-- Implement custom symbol management (add/edit/remove)
-- Add data import functionality
-- Implement auto-save functionality
+## Advanced Features:
+
+### **Note System**:
+- **Hover Popups**: Hover over days with notes to see content
+- **Numbered Footnotes**: Print view shows numbered notes below each year
+- **Edit Notes**: Click existing notes to edit them
+- **Delete Notes**: Remove notes with the delete button
+- **Modal Dialog**: Custom modal for note editing (Electron compatible)
+
+### **Data Management**:
+- **Auto-Save**: Automatic saving with visual indicators
+- **Export/Import**: JSON format with backward compatibility
+- **Migration**: Automatic migration from old data formats
+- **Local Storage**: Persistent data storage
+
+### **Print Features**:
+- **Numbered Notes**: Notes appear as numbered footnotes in print
+- **ISO Date Format**: Dates formatted as YYYY-MM-DD
+- **Clean Layout**: Print-optimized calendar layout
+- **Year Sections**: Notes grouped by year
+
+## Technical Features:
+
+- **Electron App**: Desktop application with native feel
+- **Responsive Design**: Works on different screen sizes
+- **Keyboard Navigation**: Full keyboard support
+- **Streak Counting**: Automatic streak calculation
+- **Backward Compatibility**: Handles old data formats
+
+## Installation & Building:
+
+### **Development**:
+```bash
+npm install          # Install dependencies
+npm start           # Run in development mode
+```
+
+### **Building**:
+```bash
+npm run build       # Build Electron app
+```
+
+### **Running**:
+- **Desktop**: Run `Simple Journal.exe` from the `dist` folder
+- **Web**: Open `index.html` in any modern browser
 
 ## Browser Compatibility:
 
-- Chrome/Chromium (recommended)
-- Firefox
-- Safari
-- Edge
-
-## Development:
-
-This is a vanilla HTML/CSS/JavaScript application with no external dependencies. Simply open `index.html` in a browser to run.
+- **Desktop**: Windows, macOS, Linux (Electron)
+- **Web**: Chrome/Chromium, Firefox, Safari, Edge
+- **Mobile**: Responsive design works on tablets and phones
 
 ## Data Storage:
 
-Calendar data is automatically saved to browser's localStorage. Data persists between browser sessions.
+- **Desktop**: Local file system storage
+- **Web**: Browser's localStorage
+- **Export**: JSON format for backup and sharing
+- **Import**: Restore from JSON files
+
+## Development:
+
+This is a vanilla HTML/CSS/JavaScript application with Electron for desktop deployment. No external dependencies required for web version.
