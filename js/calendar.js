@@ -6,7 +6,7 @@
 class Calendar {
     constructor() {
         this.currentYear = new Date().getFullYear();
-        this.startYear = 1990;
+        this.startYear = 1993;
         this.endYear = this.currentYear; // Show up to current year
         this.selectedDate = null;
         this.selectedNumber = null;
